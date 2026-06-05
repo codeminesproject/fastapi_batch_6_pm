@@ -2,41 +2,50 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel,Field
+from typing import List
+
+class Subjects(BaseModel):
+    id:int
+    name:str
 
 class StudentRequest(BaseModel):
-    id:int = Field(title="ID",description="used to provide id")
-    name:str = Field(title="Name",description="used to provide name")
+    id:int
+    name:str
+    subject:Subjects
+
+class StudentRequests(BaseModel):
+    id:int
+    name:str
+    subject:List[Subjects]
 
 class StudentResponse(BaseModel):
     id:int
+    subject:List[Subjects] 
 
-obj = FastAPI(title="CodeMines Management System API",
-              description="API contains all api related request and responses",
-              version="V1.0.0")
+class Request1(BaseModel):
+    id:int
+    username:str
+    password:str
+
+class Request2(BaseModel):
+    ip_address:str
+    status:str
+
+obj = FastAPI()
 
 
-@obj.get("/student/get/all",tags=["Student"],summary="used to get all student data")
-def student_get_all():
-    return JSONResponse(status_code=200,content={"data":"success"})
 
-@obj.get("/student/get/{id}",tags=["Student"],summary="used to get student data by id")
-def student_get_by_id(id:int):
-    return JSONResponse(status_code=200,content={"data":"success"})
-
-@obj.post("/student/insert",tags=["Student"],summary="used to insert new student data")
-def student_insert(request:StudentRequest):
-    response = StudentResponse(id=1234)
+@obj.post("/student/insert")
+def student_insert(request:StudentRequests):
+    response = StudentResponse(
+        id=request.id,
+        subject = request.subject
+        )
     return JSONResponse(status_code=200,content={"data":response.model_dump()})
 
-@obj.get("/teacher/get/all",tags=["teacher"])
-def teacher_get_all(name):
-    return JSONResponse(status_code=200,content={"data":"success"})
 
-@obj.get("/teacher/get/{id}",tags=["teacher"])
-def teacher_get_by_id(id:int):
-    return JSONResponse(status_code=200,content={"data":"success"})
 
-@obj.post("/teacher/insert",tags=["teacher"])
-def teacher_insert():
-    return JSONResponse(status_code=200,content={"data":"success"})
-    
+@obj.post("/student/insert/1")
+def student_insert_1(request1:Request1,request2:Request2):
+    return JSONResponse(status_code=200)
+
